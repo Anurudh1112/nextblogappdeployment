@@ -1,37 +1,76 @@
-import { blog_data } from '@/Assets/assets'
 import React, { useEffect, useState } from 'react'
 import BlogItem from './BlogItem'
-import axios from 'axios';
+import axios from 'axios'
+
+const categories = ["All", "Technology", "Startup", "Lifestyle"]
 
 const BlogList = () => {
 
-    const [menu,setMenu] = useState("All");
-    const [blogs,setBlogs] = useState([]);
+  const [menu, setMenu] = useState("All")
+  const [blogs, setBlogs] = useState([])
 
-    const fetchBlogs = async () =>{
-      const response = await axios.get('/api/blog');
-      setBlogs(response.data.blogs);
-      console.log(response.data.blogs);
+  const fetchBlogs = async () => {
+    try {
+      const response = await axios.get('/api/blog')
+      setBlogs(response.data.blogs)
+    } catch (error) {
+      console.log(error)
     }
+  }
 
-    useEffect(()=>{
-      fetchBlogs();
-    },[])
+  useEffect(() => {
+    fetchBlogs()
+  }, [])
 
   return (
-    <div>
-      <div className='flex justify-center gap-6 my-10'>
-        <button onClick={()=>setMenu('All')} className={menu==="All"?'bg-black text-white py-1 px-4 rounded-sm':""}>All</button>
-        <button onClick={()=>setMenu('Technology')} className={menu==="Technology"?'bg-black text-white py-1 px-4 rounded-sm':""}>Technology</button>
-        <button onClick={()=>setMenu('Startup')} className={menu==="Startup"?'bg-black text-white py-1 px-4 rounded-sm':""}>Startup</button>
-        <button onClick={()=>setMenu('Lifestyle')} className={menu==="Lifestyle"?'bg-black text-white py-1 px-4 rounded-sm':""}>Lifestyle</button>
+    <section className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-10">
+
+      {/* Category Buttons */}
+      <div className="flex flex-wrap justify-center gap-4 mb-14">
+
+        {categories.map((item) => (
+
+          <button
+            key={item}
+            onClick={() => setMenu(item)}
+            className={`px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300
+              ${
+                menu === item
+                  ? "bg-black text-white shadow-lg"
+                  : "bg-white border border-gray-300 hover:bg-black hover:text-white"
+              }`}
+          >
+            {item}
+          </button>
+
+        ))}
+
       </div>
-      <div className='flex flex-wrap justify-around gap-1 gap-y-10 mb-16 xl:mx-24'>
-        {blogs.filter((item)=> menu==="All"?true:item.category===menu).map((item,index)=>{
-            return <BlogItem key={index} id={item._id} image={item.image} title={item.title} description={item.description} category={item.category} />
-        })}
+
+      {/* Blog Grid */}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+        {blogs
+          .filter((item) =>
+            menu === "All" ? true : item.category === menu
+          )
+          .map((item) => (
+
+            <BlogItem
+              key={item._id}
+              id={item._id}
+              image={item.image}
+              title={item.title}
+              description={item.description}
+              category={item.category}
+            />
+
+          ))}
+
       </div>
-    </div>
+
+    </section>
   )
 }
 
